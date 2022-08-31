@@ -1,0 +1,499 @@
+	
+			PHP =	DATABASE CONNECTION
+
+<?php
+
+$userName = "root";
+$host = "localhost";
+$dbName = "junskidb";
+
+$mysqli = new mysqli($host, $userName, "" ,$dbName, "3306");
+
+if ($mysqli->connect_error){
+    die('Error : (' . $this->mysqli->connect_errno .  ') ' . $this ->mysqli->connect_error);
+}
+
+?>
+
+
+
+
+			PHP = SEARCH konekcija sa bazom
+
+<?php
+
+include_once("connectionDB.php");
+session_start();
+
+$destination = $_REQUEST["destination"];
+$checkIn = $_REQUEST["checkIn"];
+$checkOut = $_REQUEST["checkOut"];
+$room = $_REQUEST["room"];
+$traveler = $_REQUEST["traveler"];
+
+
+//Rastura spojene reci u nov niz (nove reci su odvojene zarezom)
+$countryTown = explode(",", $destination);
+$countryTown = array_map('trim', $countryTown);
+echo $destination . " " . $checkIn. " " . $checkOut. " " . $room . " " . $traveler;
+echo "<br>". $countryTown[0] . " " . $countryTown[1];
+
+
+$provera = $mysqli->query("SELECT * FROM smestaji WHERE br_soba >= '$room' AND br_mesta >= '$traveler' AND grad='$countryTown[1]' AND zemlja = '$countryTown[0]'");
+
+    if($provera->num_rows >= 1){
+
+        $data = $provera->fetch_object();
+        $_SESSION["hotel"]= $data->ime;
+        $_SESSION["arrivalDate"]= $checkIn;
+        $_SESSION["departureDate"]= $checkOut;
+        $_SESSION["numRooms"]= $room;
+
+        header("Location: ../receipt.php");
+    }else{
+        die(header("Location: ../index.php?error=1"));
+    }
+?>
+
+
+
+
+				INDEx.php pocetna
+
+
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../junski_rok_2022/css/bootstrap_css/bootstrap.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <script src="../junski_rok_2022/js/bootstrap_js/bootstrap.js"></script>
+    <title>junski rok - 2022</title>
+    <link rel="icon" href="../junski_rok_2022/img/icons/icon.png">
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-1">
+            </div>
+
+            <div class="col-10">
+                <div class="card text-dark bg-white">
+
+                    <div class="card-body">
+
+                        <p>
+                        <h2><strong>Hotel stays, dream gateways</strong></h2>
+                        <h6>Flexible booking options</h6>
+                        </p>
+
+                        <form action="./php/search.php" method="post">
+
+                            <input type="text" name="destination" placeholder="📍 Going to" list="placesList" required>
+                            <datalist id="placesList">
+                                <option value="Croatia, Dubrovnik">
+                                <option value="Croatia, Rijeka">
+                                <option value="Croatia, Split">
+                                <option value="France, Nice">
+                                <option value="France, Paris">
+                                <option value="Germany, Berlin">
+                                <option value="Germany, Hamburg">
+                                <option value="Germany, Liège">
+                                <option value="Greece, Corfu">
+                                <option value="Greece, Santorini">
+                                <option value="Greece, Thessaloniki">
+                                <option value="Macedonia, Bitola">
+                                <option value="Macedonia, Ohrid">
+                                <option value="Russia, Kazan">
+                                <option value="Russia, Moscow">
+                                <option value="Serbia, Belgrade">
+                                <option value="Serbia, Kragujevac">
+                                <option value="Serbia, Novi Sad">
+                                <option value="Spain, Cadaqués">
+                                <option value="Spain, Madrid">
+                                <option value="Turkey, Istanbul">
+                                <option value="Turkey, Izmir">
+                                <option value="United Kingdom, Acton">
+                                <option value="United Kingdom, London">
+                            </datalist>
+
+                            <input type="text" name="checkIn" placeholder="Check-in" onblur="(this.type='text')" onfocus="(this.type='date')" required>
+
+                            <input type="text" name="checkOut" placeholder="Check-out" onblur="(this.type='text')" onfocus="(this.type='date')" required>
+
+                            <input type="text" name="room" placeholder="Rooms" list="roomList" required>
+                            <datalist id="roomList">
+                                <option value="1 room">
+                                <option value="2 rooms">
+                                <option value="3 rooms">
+                                <option value="4 rooms">
+                            </datalist>
+
+                            <input type="text" name="traveler" placeholder="Travelers" list="travelerList" required>
+                            <datalist id="travelerList">
+                                <option value="1 traveler">
+                                <option value="2 travelers">
+                                <option value="3 travelers">
+                                <option value="4 travelers">
+                            </datalist>
+                            <br>
+
+                            <input type="radio" name="flight">
+                            <label for="flight">Add a flight</label>
+
+                            <input type="radio" name="car">
+                            <label for="flight">Add a car</label>
+
+                            <br>
+                            <button type="submit" class="btn btn-primary" name="search" style="width: 150px;">Search</button>
+                        </form>
+
+
+
+                    </div>
+
+                    <div class="card-footer">
+
+                        <table class="table1">
+                            <h5>Featured travel</h5>
+                            <tr>
+                                <td>
+                                    <img src="./img/img1.PNG" class="img1">
+                                </td>
+                            </tr>
+                            <br>
+                            <tr>
+                                <td bgcolor="white"> <strong>All-Inclusive Resorts</strong> <br> Get More Bang for Less Buck.</td>
+                            </tr>
+                        </table>
+
+                        <table id="spacer">
+                            <tr>
+                                <td><img src="./img/img2.PNG" class="img2"> </td>
+                                <td bgcolor="white"><b>Vacation Packages Under $400</b> <br> Book your flight and hotel
+                                    together, and <br> together we can make it happen.</td>
+                            </tr>
+                        </table>
+
+                        <table>
+
+                            <tr>
+                                <td><img src="./img/img3.PNG" class="img2"></td>
+                                <td bgcolor="white" style="width: 286px;"><b>Looking for a great hotel deal? </b> <br> Book a hotel under $99.</td>
+                            </tr>
+
+
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="col-1">
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+					RECEIPT.php
+
+
+
+<?php
+
+include_once("./php/connectionDB.php");
+session_start();
+
+?>
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../junski_rok_2022/css/bootstrap_css/bootstrap.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <script src="../junski_rok_2022/js/bootstrap_js/bootstrap.js"></script>
+    <title>Receipt</title>
+    <link rel="icon" href="../junski_rok_2022/img/icons/icon.png">
+
+    <style>
+        table.t02 {
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+
+        table.t02 {
+            border: hidden;
+        }
+
+        table.t02 td,
+        table.t02 th {
+            border: 1px solid black;
+        }
+
+        table.t03 {
+            border-top: 1px solid;
+        }
+    </style>
+
+
+</head>
+
+<body>
+
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col-1">
+            </div>
+            <div class="col-10">
+
+                <h2 class="title" style="text-align: center;"><?php if (isset($_SESSION["hotel"])) {
+                                                                    echo $_SESSION["hotel"];
+                                                                } else {
+                                                                    echo "[Hotel Name]";
+                                                                } ?></h2>
+                <br>
+                <table class="table1" style="width: 40%; margin-right: 10%;">
+                    <tr>
+                        <td bgcolor="blue" style="color:white;">
+                            <h5 class="subTitle"> Guest Details:</h5>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h6 class="info">Guest Name:</h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h6>Company / Travel Agent</h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h6>Address</h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h6>City</h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h6>Mobile / Email</h6>
+                        </td>
+                    </tr>
+
+                </table>
+
+                <table style="text-align: center; width: 50%;">
+                    <tr bgcolor="blue" style="color:white;">
+                        <th>
+                            <h5 class="subTitle">RECEIPT #</h5>
+                        </th>
+                        <th>
+                            <h5 class="subTitle">DATE</h5>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h6 class="info"><?php echo random_int(1, 999) ?></h6>
+                        </td>
+                        <td>
+                            <h6 class="info"><?php echo date("Y-m-d") ?></h6>
+                        </td>
+                    </tr>
+                    <tr bgcolor="blue" style="color:white;">
+                        <th>
+                            <h5 class="subTitle">Room No:</h5>
+                        </th>
+                        <th>
+                            <h5 class="subTitle">ResNo:</h5>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h6 class="info"><?php echo random_int(1, 200) ?></h6>
+                        </td>
+                        <td>
+                            <h6 class="info"><?php echo random_int(1, 9999) ?></h6>
+                        </td>
+                    </tr>
+                    <tr bgcolor="blue" style="color:white;">
+                        <th>
+                            <h5 class="subTitle">Arrival Date:</h5>
+                        </th>
+                        <th>
+                            <h5 class="subTitle">Arr Time:</h5>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h6 class="info"><?php if (isset($_SESSION["arrivalDate"])) {
+                                                    echo $_SESSION["arrivalDate"];
+                                                } else {
+                                                    echo "4/4/2018";
+                                                } ?></h6>
+                        </td>
+                        <td>
+                            <h6 class="info"><?php echo "16:00" ?></h6>
+                        </td>
+                    </tr>
+                    <tr bgcolor="blue" style="color:white;">
+                        <th>
+                            <h5 class="subTitle">Departure Date:</h5>
+                        </th>
+                        <th>
+                            <h5 class="subTitle">Dep Time:</h5>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h6 class="info"><?php if (isset($_SESSION["departureDate"])) {
+                                                    echo $_SESSION["departureDate"];
+                                                } else {
+                                                    echo "14/4/2018";
+                                                } ?></h6>
+                        </td>
+                        <td>
+                            <h6 class="info"><?php echo "11:00" ?></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th bgcolor="blue" style="color:white;">Page</th>
+                        <td>01 of 01</td>
+                    </tr>
+                </table>
+
+
+
+                <p class="randomInfo"><strong>Billing notes: Room To Travel Agent Rest direct by customer</strong></p>
+
+
+
+                <table class="t02" style="width: 100%; border-collapse: collapse;">
+                    <tr bgcolor="blue" style="color:white; border: 1px solid;">
+                        <th>DESCRIPTION</th>
+                        <th style="text-align: center;">QTY</th>
+                        <th>UNIT PRICE</th>
+                        <th>AMOUNT</th>
+                    </tr>
+                    <tr style="text-align: center;">
+                        <td style="text-align: left;">Room Charges - <?php if (isset($_SESSION["arrivalDate"])) {
+                                                                            echo $_SESSION["arrivalDate"];
+                                                                        } else {
+                                                                            echo "4/4/2018";
+                                                                        } ?></td>
+                        <td><?php if (isset($_SESSION["numRooms"])) {
+                                echo $_SESSION["numRooms"][0];
+                            } else {
+                                echo "N/A";
+                            } ?></td>
+                        <td>5,000.00</td>
+                        <td>5,000.00</td>
+                    </tr>
+                    <tr style="text-align: center;">
+                        <td style="text-align: left;">GST - 12%</td>
+                        <td><?php if (isset($_SESSION["numRooms"])) {
+                                echo $_SESSION["numRooms"][0];
+                            } else {
+                                echo "N/A";
+                            } ?></td>
+                        <td>600.00</td>
+                        <td>600.00</td>
+                    </tr>
+                    <tr style="text-align: center;">
+                        <td style="text-align: left;">Laundery - <?php if (isset($_SESSION["arrivalDate"])) {
+                                                                        echo date('Y-m-d', strtotime($_SESSION["arrivalDate"] . '+3 days'));
+                                                                    } else {
+                                                                        echo "4/4/2018";
+                                                                    } ?></td>
+                        <td><?php echo random_int(1, 24) ?></td>
+                        <td>10.00</td>
+                        <td>220.00</td>
+                    </tr>
+                    <tr style="text-align: center;">
+                        <td style="text-align: left;">Room Charges - <?php if (isset($_SESSION["departureDate"])) {
+                                                                            echo $_SESSION["departureDate"];
+                                                                        } else {
+                                                                            echo "4/4/2018";
+                                                                        } ?></td>
+                        <td>1.00%</td>
+                        <td>5,000.00</td>
+                        <td>50.00</td>
+                    </tr>
+                    <tr style="text-align: center;">
+                        <td style="text-align: left;">GST - 12%</td>
+                        <td><?php if (isset($_SESSION["numRooms"])) {
+                                echo $_SESSION["numRooms"][0];
+                            } else {
+                                echo "N/A";
+                            } ?></td>
+                        <td>600.00</td>
+                        <td>600.00</td>
+                    </tr>
+
+                    <table class="t03" style="width: 100%;">
+                        <tr style="text-align: center;">
+                            <th style="width: 49.1%; background-color:lightskyblue; color:blue"><i>Thank you for your business!</i></th>
+                            <th style="text-align: left; width: 32.8%; background-color:violet;">SUBTOTAL</th>
+                            <th style="background-color:lightskyblue;"></th>
+                            <th style="text-align: right; width:400px; background-color:lightskyblue;">6,470.00</th>
+                        </tr>
+                        <tr>
+                            <th> </th>
+                            <th style="width: 32.8%; background-color:violet; color:purple">TOTAL</th>
+                            <th style="background-color:lightskyblue;"></th>
+                            <th style="background-color:lightskyblue;"></th>
+                        </tr>
+                    </table>
+                </table>
+                <br>
+
+
+                <p class="randomInfo" style="text-align: center;">Regradless of the billing instruction I agree to be held personally liable for payment of the total amount of this bill.</p>
+                <br>
+                <table style="width: 100%; text-align:center;">
+                    <tr>
+                        <td>
+                            <p class="randomInfo">Cashier Signature</p>
+                        </td>
+                        <td>
+                            <p class="randomInfo">Guest Signature</p>
+                        </td>
+                    </tr>
+                </table>
+
+
+            </div>
+        </div>
+    </div>
+
+
+</body>
+
+</html>
+
