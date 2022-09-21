@@ -1,0 +1,225 @@
+
+			INDEXxxxxxxxxxxxxxxxxxx
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="../septembar/css/bootstrap_css/bootstrap.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <script src="../junski_rok_2022/js/bootstrap_js/bootstrap.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<?php
+    include_once("php/database.php");
+    session_start();
+?>
+
+<body>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-2">
+            </div>
+
+            <div class="col-8">
+                <?php
+
+                $query = $mysqli->query("SELECT * FROM septembar");
+
+                // kupi podatke kroz svaki prolaz u perlji da bi ih ispisali posle
+                while ($data = $query->fetch_object()) {
+
+                    echo '<div class="card text-white bg-dark" style="margin-bottom: 100px;">';
+                       
+                        echo '<div class="card-header">';
+                            echo '<h3 class="card-title" style="text-align:center;" > <i> ' . $data->name  . ' </i> </h3>';
+                            echo '<h6 class="card-subtitle text-muted"></h6>';
+                        echo '</div>';
+
+                        echo '<div class="card-body">';
+                            echo '<p class="card-text">';
+                            echo ' <img class="img1" src="./img/' . $data->image . '">';
+                            echo '<h1>' . $data->comment .'</h1>';
+                            echo '</p>';
+                            
+                        echo '</div>';
+
+                        echo '<div class="card-footer text-muted" style="text-align:center;">';
+                            echo '<div class="card-body">';
+
+                            
+                                echo '<form action="./register.php" method="post">';
+
+                                    echo '<input type="hidden" value="'. $data->id .'" name="dislike">';
+                                    echo '<button type="submit" class="btn btn-primary" style="width: 150px;">Dislike:' . $data->dislike .'</button>';
+                                   
+                                
+                                echo '</form>';
+
+                                echo '<form action="./lajkovi.php" method="post">';
+
+                                    echo '<input type="hidden" value="'. $data->id .'" name="likes">';
+                                    echo '<button type="submit" class="btn btn-primary" style="width: 150px;">Likes:' . $data->likes .'</button>';
+                                   
+                                
+                                echo '</form>';
+                            
+
+                            echo '</div>';
+                        echo '</div>';
+                    echo '</div>';
+                }
+
+                ?>
+
+            </div>
+
+
+            <div class="col-2">
+            </div>
+        </div>
+    </div>
+
+
+
+</body>
+
+</html>
+
+
+
+				DATABASE CONNECTiooonnnnnnnnn
+
+
+
+<?php
+
+    // KONEKCIJA SA BAZOM PODATAKA 
+
+    $host = "localhost";
+    $user = "root";
+    $password = "";
+    $dbname = "septembar";
+
+    $mysqli = new mysqli($host, $user, $password, $dbname, "3306");
+
+    if($mysqli -> connect_error){
+        die('Error : (' . $this -> mysqli -> connect_errno . ')' . $this -> mysqli -> connect_error);
+    }
+
+?> 
+
+
+
+
+
+				style cssssssssssssssssss
+
+
+.img1{
+    width: 500px;
+    height: 400px;
+    display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 60%;
+}
+
+.bg{
+    background-color: white;
+}
+
+.img2{
+    width: 80px;
+    height: 120px;
+}
+
+.table1{
+    float: left;
+    margin-right: 20px;
+    position: relative;
+  
+}
+
+
+#table2{
+    border-bottom: 5px;
+    
+}
+
+#spacer{
+    margin-bottom: 10px;
+    
+}
+
+.table123{
+    border: 5px solid black;
+}
+
+.th1{
+    color: white;
+    background-color: blue;
+}
+
+
+
+
+				likesssssssssssssss
+
+<?php
+
+include_once("./php/database.php");
+
+
+$likes = $_REQUEST["likes"];
+
+$query = $mysqli -> query("SELECT likes FROM septembar WHERE id='".$likes."'");
+
+
+$data = $query->fetch_object();
+
+    $likess = $data->likes + 1;
+
+    $mysqli->query("UPDATE septembar SET likes = '".$likess."'  WHERE id = '".$likes."' ");
+
+
+        header("Location: ./index.php");
+
+?>
+
+
+
+				dislikes registriiiiiiiiiiiiiiiiiiii
+
+
+<?php
+
+include_once("./php/database.php");
+
+
+$dislike = $_REQUEST["dislike"];
+
+$query = $mysqli -> query("SELECT dislike FROM septembar WHERE id='".$dislike."'");
+
+
+$data = $query->fetch_object();
+
+
+
+    $dislikee = $data->dislike + 1;
+
+    $mysqli->query("UPDATE septembar SET dislike = '".$dislikee."'  WHERE id = '".$dislike."' ");
+
+
+        header("Location: ./index.php");
+
+?>
+
+
+
